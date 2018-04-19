@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Traveling Sales Person</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="css/scrolling-nav.css" rel="stylesheet">
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<!-- The #page-top ID is part of the scrolling feature - the data-spy and data-target are part of the built-in Bootstrap scrollspy function -->
+
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+        <div class="container">
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span> -->
+                </button>
+                <a class="navbar-brand page-scroll">Ravjeet Bagal</a>
+            </div>
+
+            
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <!-- Intro Section -->
+    <section id="intro" class="intro-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 text-left">
+                    <h1>Traveling Sales Person</h1>
+					
+					<h2>My Content</h2>
+					<p>Click to expand and see the content of the classes along side a brief description explaining them and their purpose</p> 
+					<p>	The Travelling Salesman Problem, or TSP is a very popular example of Solution Optimisation. The first solution to finding the optimum tour, can easilly be optimised if you produce the first tour without prior optimisation. Optimisation is typically done through changing single elements each time until the solution is as efficient as possible. In this scenario, the element being changed can be which city is visited after visiting City A. The optimum tour will be the shortest route through all cities. </p>
+						
+						<h4>Lab15</h4>
+						<button type="button" class="btn btn-dark" data-toggle="collapse" data-target="#Lab15Code">Lab15 Code</button>
+  <div id="Lab15Code" class="collapse">
+  <div class="col-lg-12">
+  <div class="col-lg-8 text-left">
+						<pre >
+	import java.util.ArrayList;
+	import static java.lang.Math.exp;
+
+	public class Lab15 {
+	    public static void main(String args[]) {
+	        double [][] distance;
+	        distance = TSP.ReadArrayFile("C:\\Users\\rbaga\\Desktop\\Labs\\CS2004 TSP Data (2017-2018)\\TSP_442.txt" , " ");  // reads the text files containing N number of cities
+
+	        ArrayList<Integer> OPT;
+	        OPT = TSP.ReadIntegerFile("C:\\Users\\rbaga\\Desktop\\Labs\\CS2004 TSP Data (2017-2018)\\TSP_442_OPT.txt");  // reads the text file for the optimal path though N number of cities 
+	        System.out.println("Optimal path");
+	        System.out.println(OPT);
+	        HillClimb optimal = new HillClimb(OPT);														// used to find optimal fitness from the optimal path files
+	        double Optfitness = optimal.fitness(distance.length,distance);
+	        System.out.println(Optfitness);
+	        double percentage;																			// used to calculate efficiency of each algorithm
+	        int nIter = 1000000;																		// variable that will make all algorithm iterate N number of times.
+
+	//----------------------------------------------------Simple Hill Climbing (Random Mutation)----------------------------------------
+	        System.out.println();
+	        System.out.println("Simple HC solution:");
+	        HillClimb simple = simpleHC(distance.length,distance, nIter);    //number of cities, distance array, how many iterations
+	        percentage = (Optfitness/ simple.fitness(distance.length,distance))*100;
+	        System.out.println("Percentage efficiency: " + percentage +"%");
+
+	//----------------------------------------------------Stochastic Hill Climbing------------------------------------------------------
+
+	        System.out.println();
+	        System.out.println("Stochastic HC solution:");
+	        HillClimb stochastic = stochasticHC(distance.length,distance, nIter);    //number of cities, distance array, how many iterations
+	        percentage = (Optfitness/ stochastic.fitness(distance.length,distance))*100;
+	        System.out.println("Percentage efficiency: " + percentage +"%");
+
+	//----------------------------------------------------Random Restart Hill Climbing--------------------------------------------------
+	        System.out.println();
+	        System.out.println("Random Restart HC solution:");
+	        HillClimb restart = restartHC(distance.length,distance, 10,nIter);     //number of cities, distance array, how many restarts, iterations per restart
+	        percentage = (Optfitness/restart.fitness(distance.length,distance))*100;
+	        System.out.println("Percentage efficiency: " + percentage +"%");
+
+	    }
+
+	    public static HillClimb simpleHC (int N, double[][] distance,int iter)  // Simple hill climb method
+	    {
+	        HillClimb s = new HillClimb(N);
+	        HillClimb s1;
+	        double fitness1;
+	        double fitness2;
+
+	        for (int i=0; i < iter; i++)
+	        {
+	            s1 = new HillClimb (s.GetSol());
+	            fitness1 = s.fitness(N,distance);
+	            s1.Swap();
+	            fitness2 = s1.fitness(N,distance);
+
+	            if (fitness2 < fitness1)
+	            {
+	                s = s1;
+	            }
+	        }
+	        System.out.println("final solution");
+	        System.out.println(s.GetSol());
+	        System.out.println(s.fitness(distance.length,distance));
+	        return s;                          // returns a final solution from this method
+	    }
+
+	    public static HillClimb stochasticHC (int N, double[][] distance,int iter)  // Stochastic hill climb method
+	    {
+	        HillClimb s = new HillClimb(N);
+	        HillClimb s1;
+	        double fitness1, fitness2,pr;
+	        double Tval = 200;
+
+	        for (int i=0; i < iter; i++)
+	        {
+	            s1 = new HillClimb(s.GetSol());
+	            fitness1 = s.fitness(N,distance);
+	            s1.Swap();
+	            fitness2 = s1.fitness(N,distance);
+
+	            pr = 1/(1+exp((fitness2-fitness1)/Tval));
+	            double rand = TSP.UR(0,1);
+
+	            if (fitness2 < fitness1)
+	            {
+	                s = s1;
+	            }
+	            else if(rand < pr)
+	            {
+	                s = s1;
+	            }
+	        }
+	        System.out.println("final solution");
+	        System.out.println(s.GetSol());
+	        System.out.println(s.fitness(distance.length,distance));
+	        return s;                            // returns a final solution from this method 
+	    }
+
+	    public static HillClimb restartHC (int N, double[][] distance,int restart, int iter) // Random restart hill climb method
+	    {
+	        HillClimb best = new HillClimb(0);
+	        double bestfitness = Double.MAX_VALUE;
+	        HillClimb test;
+	        double testfitness;
+	        for (int i=0; i < restart; i++)
+	        {
+	            HillClimb s = new HillClimb(N);
+	            HillClimb s1;
+	            double fit, fit1;
+
+	            for (int j=0; j < iter; j++)
+	            {
+	                s1 = new HillClimb(s.GetSol());
+	                fit = s.fitness(N,distance);
+	                s1.Swap();
+	                fit1 = s1.fitness(N,distance);
+
+	                if (fit1 < fit)
+	                {
+	                    s = s1;
+	                }
+	            }
+//	            System.out.println(s.GetSol());   //// Remove comments to see restart steps for the algorithm
+
+	            test = s;
+	            testfitness = s.fitness(N,distance);
+	            if (testfitness < bestfitness)
+	            {
+	                best = test;
+	                bestfitness = test.fitness(N,distance);
+	            }
+	        }
+	        System.out.println("final solution");
+	        System.out.println(best.GetSol());
+	        System.out.println(best.fitness(distance.length, distance));
+	        return best;						// returns best solution from this method
+	    }
+	}
+
+</pre>
+</div>
+<div class="col-lg-4 text-center">
+						
+						<p>TSP is an NP hard problem - non deterministic in polynomial time <p>
+						
+						<h4>Random Mutation</h4>
+						<p>Random Mutation Hill Climb or RMHC, is a form of Hill Climbing optimisation algorithm which
+
+calculates the optimum solution of a dataset. Unlike other Hill Climbing Algorithms, the RMHC
+
+starts with a solution and selects neighbouring solutions until the ultimate solution is achieved. 
+</p>
+						<h4>Stochastic</h4>
+						<p>The Stochastic Hill Climb or SHC, is a unique form of Hill Climbing Algorithm which mainly
+
+specialises in local optima. Like the Random Mutation Hill Climber, the SCH checks
+
+neighbouring solutions however; the SCH only checks the next solution unlike the Random
+
+Mutation which checks all neighbours. This change of algorithm was proposed with the
+
+intention to prevent Stuck Local Optima problems. Despite this, the Stochastic Hill Climb can
+
+also be affected by stuck local optima.</p>
+<h4>Random Restart</h4>
+						<p>The Random Restart Hill Climb or RRHC, is a form of Hill Climbing algorithm like the RMHC
+
+algorithm. This algorithm calculates the ultimate solution by picking a random solution at the
+
+start of each iteration. If this condition is better than the previous, it will keep it and continue
+
+the optimisation.
+</p>
+						<h4>Simulated Annealing</h4>
+						<p>The Simulated Annealing Algorithm or SA, is a unique Optimisation Algorithm which, unlike Hill
+
+Climbers, focuses on the optimisation of a solution using a similar method to metallurgy.
+Starting at a High Temperature, the algorithm accepts all the solutions however, as the
+
+temperature is cooled, the worse solutions are dropped resulting in the final solution.
+</p>
+						<h4>MST</h4>
+						<p>Within the code, there is a method which calculates the MST Efficiency Percentage. First, a
+
+two-dimensional array is created which contains a Distance Array. This Distance Array is
+
+essentially the distances between cities. To calculate the minimum spanning tree, we’re
+
+using the Prims MST Algorithm. In short, the Prims Algorithm simply finds the minimum spanning
+
+tree of an undirected graph, in this case, the array of directions between cities. Once a
+
+Minimum Spanning Tree is created, we can calculate the fitness or MST Efficiency by running
+
+a nested for loop through the two-dimensional array, while adding all the values to a fitness
+
+variable, once this overall score is completed, the fitness score is calculated by dividing the
+
+overall score by two.
+</p>
+				<h4>Optimum Tour Efficiency</h4>
+				<p>Another way of checking the quality of the solution is to compare the fitness against the
+
+optimum tour. The optimum tour, in this scenario is defined as an array of numbers which
+
+represent the optimum tour against several cities. We are essentially comparing our results
+
+with a set of results already calculated. To calculate the efficiency of the Optimum Tour
+
+against our current tour, the fitness of the optimum tour must be calculated, with this value,
+
+we can calculate the overall efficiency by dividing the Optimum Tour Fitness from the current
+
+fitness. This value is then multiplied by 100 to produce the Optimum Tour Efficiency.</p>
+					</div>
+</div>                    
+</div>
+							<h4>HillCLimb</h4>
+							<button type="button" class="btn btn-dark" data-toggle="collapse" data-target="#HillClimbCode">HillClimb Code</button>
+  <div id="HillClimbCode" class="collapse">
+  <div class="col-lg-12">
+  <div class="col-lg-8 text-left">
+							<pre>
+import java.util.ArrayList;
+
+
+// Hill climb class defined below allowing each algorithm to function 
+
+public class HillClimb {
+    private ArrayList<Integer> sol = new ArrayList<Integer>(); // an array list of all integers in a solution
+
+    public HillClimb(ArrayList<Integer> list)
+    {
+        sol = list;
+    }
+
+    public HillClimb(int n)
+    {
+        sol = RandPerm(n);
+    }
+
+    public static ArrayList<Integer> RandPerm(int N)  // creates a random permutation based on the shared random object in TSP class
+    {
+        ArrayList<Integer> P = new ArrayList<Integer>();
+        for (int i = 0; i < N; i++)
+        {
+            P.add((i));
+        }
+
+        ArrayList<Integer> T = new ArrayList<Integer>();
+
+        while (P.size() > 0)
+        {
+            int i = TSP.UI(0, P.size()-1);
+            T.add(P.get(i));
+            P.remove(i);
+        }
+        return T;
+    }
+
+    public void Swap()
+    {
+        int i =0;
+        int j= 0 ;
+        while (i == j)
+        {
+            i = TSP.UI(0,sol.size() -1);
+            j = TSP.UI(0,sol.size() -1);
+        }
+        int temp = sol.get(i);
+        sol.set(i,sol.get(j));
+        sol.set(j,temp);
+    }
+
+    public double getfitness(int N, ArrayList<Integer> T, double[][] D)  // returns fitness to a given method
+    {
+        double s = 0;
+        for (int i = 0; i < (N-1); i++ )
+        {
+            int a = T.get(i);
+            int b = T.get(i+1);
+            s = s + D[a][b];
+        }
+        int endcity = T.get(T.size()-1);
+        int startcity = T.get(0);
+        s = s + D[endcity][startcity];
+        return s;
+    }
+
+    public double fitness(int N, double[][] D)  // fitness function calculates fitness of a solution
+    {
+        double s = 0;
+        for (int i = 0; i < (N-1); i++ )
+        {
+            int a = sol.get(i);
+            int b = sol.get(i+1);
+            s = s + D[a][b];
+        }
+        int endcity = sol.get(sol.size()-1);
+        int startcity = sol.get(0);
+        s = s + D[endcity][startcity];
+        return s;
+    }
+
+    public void print()
+    {
+        System.out.println(sol);
+    }
+
+    public ArrayList<Integer> GetSol() // gets a solution and returns a copy of it in my methods this is the final solutions 
+    {
+        ArrayList<Integer> clone = new ArrayList<Integer>(sol.size());
+        for (int i = 0; i < sol.size();i++)
+        {
+            clone.add(sol.get(i));
+        }
+        return(clone);
+    }
+   
+}
+
+</pre>
+</div>
+<div class="col-lg-4 text-center">
+						
+						<p>test text2<p>
+						
+					</div>
+</div> 
+</div>
+							<h4>TSP</h4>
+							<button type="button" class="btn btn-dark" data-toggle="collapse" data-target="#TSPCode">TSP Code</button>
+  <div id="TSPCode" class="collapse">
+  <div class="col-lg-12">
+  <div class="col-lg-8 text-left">
+							<pre>import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.Reader;
+import java.io.StreamTokenizer;
+import java.util.ArrayList;
+import java.util.Random;
+
+//Some useful code for the CS2004 (2016-2017) Travelling Salesman Worksheet
+public class TSP 
+{
+	//Print a 2D double array to the console Window
+	static public void PrintArray(double x[][])
+	{
+		for(int i=0;i<x.length;++i)
+		{
+			for(int j=0;j<x[i].length;++j)
+			{
+				System.out.print(x[i][j]);
+				System.out.print(" ");
+			}
+			System.out.println();
+		}
+	}
+	//This method reads in a text file and parses all of the numbers in it
+	//This method is for reading in a square 2D numeric array from a text file
+	//This code is not very good and can be improved!
+	//But it should work!!!
+	//'sep' is the separator between columns
+	static public double[][] ReadArrayFile(String filename,String sep)
+	{
+		double res[][] = null;
+		try
+		{
+			BufferedReader input = null;
+			input = new BufferedReader(new FileReader(filename));
+			String line = null;
+			int ncol = 0;
+			int nrow = 0;
+			
+			while ((line = input.readLine()) != null) 
+			{
+				++nrow;
+				String[] columns = line.split(sep);
+				ncol = Math.max(ncol,columns.length);
+			}
+			res = new double[nrow][ncol];
+			input = new BufferedReader(new FileReader(filename));
+			int i=0,j=0;
+			while ((line = input.readLine()) != null) 
+			{
+				
+				String[] columns = line.split(sep);
+				for(j=0;j<columns.length;++j)
+				{
+					res[i][j] = Double.parseDouble(columns[j]);
+				}
+				++i;
+			}
+		}
+		catch(Exception E)
+		{
+			System.out.println("+++ReadArrayFile: "+E.getMessage());
+		}
+	    return(res);
+	}
+	//This method reads in a text file and parses all of the numbers in it
+	//This code is not very good and can be improved!
+	//But it should work!!!
+	//It takes in as input a string filename and returns an array list of Integers
+	static public ArrayList<Integer> ReadIntegerFile(String filename)
+	{
+		ArrayList<Integer> res = new ArrayList<Integer>();
+		Reader r;
+		try
+		{
+			r = new BufferedReader(new FileReader(filename));
+			StreamTokenizer stok = new StreamTokenizer(r);
+			stok.parseNumbers();
+			stok.nextToken();
+			while (stok.ttype != StreamTokenizer.TT_EOF) 
+			{
+				if (stok.ttype == StreamTokenizer.TT_NUMBER)
+				{
+					res.add((int)(stok.nval));
+				}
+				stok.nextToken();
+			}
+		}
+		catch(Exception E)
+		{
+			System.out.println("+++ReadIntegerFile: "+E.getMessage());
+		}
+	    return(res);
+	}
+	
+	//Shared random object
+		static private Random rand;
+		//Create a uniformly distributed random integer between aa and bb inclusive
+		static public int UI(int aa,int bb)
+		{
+			int a = Math.min(aa,bb);
+			int b = Math.max(aa,bb);
+			if (rand == null) 
+			{
+				rand = new Random();
+				rand.setSeed(System.nanoTime());
+			}
+			int d = b - a + 1;
+			int x = rand.nextInt(d) + a;
+			return(x);
+		}
+		//Create a uniformly distributed random double between a and b inclusive
+		static public double UR(double a,double b)
+		{
+			if (rand == null) 
+			{
+				rand = new Random();
+				rand.setSeed(System.nanoTime());
+			}
+			return((b-a)*rand.nextDouble()+a);
+		}
+	
+}
+</pre>
+</div>
+<div class="col-lg-4 text-center">
+						
+						<p>test text2<p>
+						
+					</div>
+</div> 
+</div>
+
+
+
+
+
+					
+					
+                </div>
+            </div>
+        </div>
+    </section>
+						
+    
+
+    <!-- jQuery -->
+    <script src="js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+
+    <!-- Scrolling Nav JavaScript -->
+    <script src="js/jquery.easing.min.js"></script>
+    <script src="js/scrolling-nav.js"></script>
+
+</body>
+
+</html>
